@@ -1,0 +1,17 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Variables de entorno
+.env
+.env.local
+*.local
+
+# IDEs / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
