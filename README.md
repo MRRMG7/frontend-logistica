@@ -33,13 +33,32 @@ npm run preview   # sirve dist/ localmente para probar
 
 ## Configurar la URL del backend
 
-La URL de la API está definida en `src/api.ts`:
+La dirección de la API se toma de la variable de entorno **`VITE_API_URL`**. Si no está definida, el
+frontend usa `http://localhost:8000` por defecto.
 
-```ts
-export const API_URL = "http://localhost:8000";
+Copiá el archivo de ejemplo y editá el valor:
+
+```bash
+cp .env.example .env      # Linux / Mac
+copy .env.example .env    # Windows
 ```
 
-**Cambiala por la URL de tu backend** antes de correr el proyecto. Si el backend corre en otro host, el servidor de Vite hace las peticiones desde el navegador, por lo que esa URL debe ser accesible desde la máquina donde se abre la app.
+```ini
+# .env
+VITE_API_URL=http://3.23.84.160:8000
+```
+
+> **Ojo — esto se lee al compilar, no en caliente.** Si cambiás el valor, hay que volver a correr
+> `npm run build` para que el cambio se vea.
+>
+> Cuidado con el BOM: si creás el `.env` desde PowerShell, guardalo **sin BOM** o Vite no va a leer la
+> variable y se va a quedar apuntando a `localhost`.
+
+`.env` está en `.gitignore`, así que **nunca se sube al repositorio**. Para cambiar de servidor solo
+se edita el archivo local.
+
+Si el backend corre en otra máquina, esa URL tiene que ser accesible desde el navegador del usuario
+y el backend tiene que permitir el origen del frontend en su configuración de CORS.
 
 ## Estructura
 

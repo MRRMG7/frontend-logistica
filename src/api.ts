@@ -1,6 +1,7 @@
 import type { Estado } from "./types";
 
-export const API_URL = "http://localhost:8000";
+export const API_URL =
+  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || "http://localhost:8000";
 
 export const ESTADO_META: Record<
   Estado,
