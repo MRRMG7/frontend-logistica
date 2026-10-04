@@ -32,7 +32,10 @@ la sesión.
 | Usuario | Contraseña | Qué ve al entrar |
 |---|---|---|
 | `admin` | `123` | Panel de administración |
-| `conductor1` | `123` | Sus entregas |
+
+**No hay cuentas de conductor ni de cliente creadas de fábrica.** Cuando el administrador da de alta un
+conductor, el sistema le genera un usuario y le muestra la contraseña en pantalla. Anótala en ese momento:
+después no se puede volver a ver.
 
 ---
 
@@ -124,6 +127,22 @@ Al entrar, el mapa se posiciona solo para mostrarte los paquetes que están acti
    Al soltarlo, la dirección se escribe sola en el cuadrito de abajo.
 3. Cuando la ubicación esté correcta, hacé clic en **"+ Registrar pedido"**.
    Se abre el formulario con la ubicación ya puesta.
+
+#### Cómo poner el cliente
+
+En el formulario, el campo **Cliente** es un cuadrito de texto: **escribís el nombre**, no lo elegís de
+una lista.
+
+- Mientras escribís, te van apareciendo los clientes que ya existen abajo del cuadrito. Si ves al que
+  buscás, hacé clic en él y listo.
+- **No importa cómo lo escribas**: si ponés `juan`, `JUAN` o `perez` sin tilde, lo encuentra igual.
+- Si el nombre **no coincide con nadie**, abajo te avisa que ese cliente se va a crear solo al guardar.
+  Podés seguir adelante o ir a la pestaña **Clientes** a cargarlo con teléfono y dirección.
+- Si el nombre coincide **a medias** con alguien de la lista, el sistema no te deja guardar hasta que
+  elijas a esa persona. Así no se crean clientes repetidos por error.
+
+El cliente que se crea solo queda con el teléfono y la dirección vacíos. Después lo podés completar en la
+pestaña **Clientes**.
 
 #### La tabla de paquetes
 
@@ -303,7 +322,8 @@ Si algo sale mal, el conductor aprieta "Incidencia" y después puede "Reanudar e
   número** en la pantalla principal.
 - **No se pueden cancelar paquetes.** El estado "Cancelado" no se puede activar desde la pantalla. Si
   querés que un paquete deje de estar activo, quitale el conductor y queda en "Pendiente".
-- **No se pueden cambiar contraseñas.** La contraseña se define cuando se crea el conductor.
+- **No se pueden cambiar contraseñas.** Todos los conductores se crean con la misma contraseña (`123`) y no
+  hay forma de cambiarla. Si necesitás más seguridad, hay que pedir ese cambio en el sistema.
 - **No hay reportes, ni descargas de Excel, ni impresión.**
 - **No hay historial.** Solo se ve el estado actual de un paquete, no los cambios anteriores ni quién
   los hizo.
@@ -335,5 +355,5 @@ Si algo sale mal, el conductor aprieta "Incidencia" y después puede "Reanudar e
 |---|---|---|---|
 | **Visitante** | Nada, sin cuenta | La pantalla de inicio | Rastrear un paquete por número |
 | **Administrador** | admin / 123 | Panel con 5 secciones | Crear y editar clientes, conductores, vehículos y paquetes. Asignar conductores. Ver mapas y estadísticas. |
-| **Conductor** | conductor1 / 123 | Solo mis entregas | Ver mis paquetes en el mapa. Marcar "en camino", "entregado" o "incidencia". |
-| **Cliente** | cliente1 / 123 | "Panel en construcción" | Nada todavía. Que use el rastreo por número. |
+| **Conductor** | El usuario que le dio el administrador al darlo de alta | Solo mis entregas | Ver mis paquetes en el mapa. Marcar "en camino", "entregado" o "incidencia". |
+| **Cliente** | No hay cuentas de cliente por el momento | "Panel en construcción" | Nada todavía. Que use el rastreo por número. |

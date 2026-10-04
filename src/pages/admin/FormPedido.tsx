@@ -17,6 +17,9 @@ interface Props {
   onGuardado: () => Promise<void>;
 }
 
+const sinAcentos = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
 export default function FormPedido({
   pedido,
   clientes,
@@ -29,6 +32,9 @@ export default function FormPedido({
   const [clientesFetched, setClientesFetched] = useState<Cliente[]>(clientes ?? []);
   const [vehiculosFetched, setVehiculosFetched] = useState<Vehiculo[]>(vehiculos ?? []);
   const [idCliente, setIdCliente] = useState(pedido?.id_cliente ?? 0);
+  const [nombreCliente, setNombreCliente] = useState("");
+  const [sugerencias, setSugerencias] = useState<Cliente[]>([]);
+  const [sugerenciasAbiertas, setSugerenciasAbiertas] = useState(false);
   const [idConductor, setIdConductor] = useState(pedido?.id_conductor ?? 0);
   const [idVehiculo, setIdVehiculo] = useState(pedido?.id_vehiculo ?? 0);
   const [direccion, setDireccion] = useState(pedido?.direccion ?? iniciales?.direccion ?? "");
@@ -47,6 +53,50 @@ export default function FormPedido({
       api<Vehiculo[]>("/vehiculos").then(setVehiculosFetched).catch(() => {});
     }
   }, [clientesFetched.length, vehiculosFetched.length]);
+
+  useEffect(() => {
+    if (nombreCliente.trim() || !pedido?.id_cliente || !clientesFetched.length) return;
+    const c = clientesFetched.find((x) => x.id_cliente === pedido.id_cliente);
+    if (c) setNombreCliente(c.nombre);
+  }, [clientesFetched, nombreCliente, pedido]);
+
+  const calcularSugerencias = (valor: string) => {
+    const n = sinAcentos(valor);
+    return n
+      ? clientesFetched.filter((c) => sinAcentos(c.nombre).includes(n)).slice(0, 8)
+      : clientesFetched.slice(0, 8);
+  };
+
+  const coincideConAlguno = (valor: string) => {
+    const n = sinAcentos(valor);
+    return n !== "" && clientesFetched.some((c) => sinAcentos(c.nombre).includes(n));
+  };
+
+  const escribirNombreCliente = (valor: string) => {
+    setNombreCliente(valor);
+    setSugerenciasAbiertas(true);
+    setIdCliente(
+      clientesFetched.find((c) => sinAcentos(c.nombre) === sinAcentos(valor))?.id_cliente ?? 0,
+    );
+    setSugerencias(calcularSugerencias(valor));
+  };
+
+  const abrirSugerencias = () => {
+    setSugerenciasAbiertas(true);
+    setSugerencias(calcularSugerencias(nombreCliente));
+  };
+
+  const elegirCliente = (c: Cliente) => {
+    setNombreCliente(c.nombre);
+    setIdCliente(c.id_cliente);
+    setSugerencias([]);
+    setSugerenciasAbiertas(false);
+  };
+
+  const nombreClienteParcial =
+    nombreCliente.trim() !== "" && idCliente === 0 && coincideConAlguno(nombreCliente);
+  const clienteEsNuevo =
+    nombreCliente.trim() !== "" && idCliente === 0 && !coincideConAlguno(nombreCliente);
 
   useEffect(() => {
     const cont = mapaCont.current;
@@ -107,22 +157,46 @@ export default function FormPedido({
   async function enviar(e: FormEvent) {
     e.preventDefault();
     setError("");
-    if (!idCliente) return setError("Seleccioná un cliente.");
+    const nombre = nombreCliente.trim();
+    if (!nombre) return setError("Escribí el nombre del cliente.");
     if (!direccion.trim()) return setError("Completá la dirección.");
     if (!latitud || !longitud) return setError("Las coordenadas son obligatorias.");
 
-    const cuerpo = {
-      id_cliente: Number(idCliente),
-      direccion: direccion.trim(),
-      latitud: Number(latitud),
-      longitud: Number(longitud),
-      id_conductor: idConductor ? Number(idConductor) : null,
-      id_vehiculo: idVehiculo ? Number(idVehiculo) : null,
-      estado: "PENDIENTE" as const,
-    };
+    let clienteId =
+      idCliente ||
+      clientesFetched.find((c) => sinAcentos(c.nombre) === sinAcentos(nombre))?.id_cliente ||
+      0;
+
+    // Si el nombre coincide a medias con alguien de la lista, no se crea nada: hay que elegir.
+    if (!clienteId && coincideConAlguno(nombre)) {
+      return setError(`"${nombre}" coincide con un cliente de la lista. Elegilo para continuar.`);
+    }
 
     setGuardando(true);
     try {
+      if (!clienteId) {
+        const nuevo = await api<Cliente>("/clientes", {
+          method: "POST",
+          body: JSON.stringify({
+            nombre,
+            telefono: "",
+            email: "sin@correo.sv",
+            direccion: "",
+          }),
+        });
+        clienteId = nuevo.id_cliente;
+      }
+
+      const cuerpo = {
+        id_cliente: Number(clienteId),
+        direccion: direccion.trim(),
+        latitud: Number(latitud),
+        longitud: Number(longitud),
+        id_conductor: idConductor ? Number(idConductor) : null,
+        id_vehiculo: idVehiculo ? Number(idVehiculo) : null,
+        estado: "PENDIENTE" as const,
+      };
+
       if (pedido) {
         const prev = pedido.estado;
         await api(`/pedidos/${pedido.id_pedido}`, {
@@ -168,20 +242,43 @@ export default function FormPedido({
         )}
 
         <div className="mt-4 space-y-4">
-          <div>
+          <div className="relative">
             <label className={labelCls}>Cliente</label>
-            <select
-              value={idCliente}
-              onChange={(e) => setIdCliente(Number(e.target.value))}
+            <input
+              value={nombreCliente}
+              onChange={(e) => escribirNombreCliente(e.target.value)}
+              onFocus={abrirSugerencias}
+              onBlur={() => window.setTimeout(() => setSugerenciasAbiertas(false), 150)}
               className={inputCls}
-            >
-              <option value={0}>— Seleccionar —</option>
-              {clientesFetched.map((c) => (
-                <option key={c.id_cliente} value={c.id_cliente}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
+              placeholder="Escribí el nombre del cliente"
+              autoComplete="off"
+            />
+            {sugerenciasAbiertas && sugerencias.length > 0 && (
+              <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-300 bg-white py-1 shadow-lg">
+                {sugerencias.map((c) => (
+                  <li key={c.id_cliente}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => elegirCliente(c)}
+                      className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                    >
+                      {c.nombre}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {nombreClienteParcial && (
+              <p className="mt-1 text-xs text-amber-600">
+                Ese nombre coincide con un cliente de la lista. Elegilo para continuar.
+              </p>
+            )}
+            {clienteEsNuevo && (
+              <p className="mt-1 text-xs text-slate-500">
+                No hay nadie con ese nombre. Se creará el cliente «{nombreCliente.trim()}» al guardar.
+              </p>
+            )}
           </div>
 
           {(conductores || []).length > 0 && (
