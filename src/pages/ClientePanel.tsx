@@ -209,7 +209,7 @@ export default function ClientePanel() {
             </div>
             <div className="cuerpo-tarjeta">
               <form onSubmit={guardarPerfil}>
-                <div className="form-grid-4">
+                <div className="form-grid-4 cliente-perfil-grid">
                   <label className="campo">
                     <span>Nombre completo</span>
                     <input value={nombre} onChange={(e) => setNombre(e.target.value)} autoComplete="name" />
