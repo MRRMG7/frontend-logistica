@@ -226,6 +226,21 @@ export default function Inicio() {
                 ) : (
                   <p className="aviso-banner ambar">La ubicación del pedido está fuera del área de servicio.</p>
                 )}
+
+                <div className="inicio-resultado-acciones">
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => {
+                      setPedido(null);
+                      setBusqueda("");
+                      setError("");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    ← Regresar al rastreo
+                  </button>
+                </div>
               </div>
             )}
           </div>

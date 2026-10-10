@@ -290,6 +290,8 @@ input, select, textarea { font-family: inherit; }
   padding-top: 16px;
 }
 
+.inicio-resultado-acciones { display: flex; justify-content: flex-start; margin-top: 18px; }
+
 .inicio-banner {
   display: flex;
   justify-content: space-between;
