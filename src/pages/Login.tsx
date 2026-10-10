@@ -23,8 +23,16 @@ export default function Login() {
     }
     setCargando(true);
     try {
-      await login(usuario, password);
-      navigate(from, { replace: true });
+      const data = await login(usuario, password);
+      const destino =
+        from && from !== "/"
+          ? from
+          : data.rol === "ADMIN"
+            ? "/admin"
+            : data.rol === "CONDUCTOR"
+              ? "/conductor"
+              : "/";
+      navigate(destino, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo conectar con el servidor.");
     } finally {

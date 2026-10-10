@@ -45,7 +45,18 @@ function RouterApp() {
 
   return (
     <Routes>
-      <Route path="/" element={<Inicio />} />
+      <Route
+        path="/"
+        element={
+          sesion && sesion.rol === "ADMIN" ? (
+            <Navigate to="/admin" replace />
+          ) : sesion && sesion.rol === "CONDUCTOR" ? (
+            <Navigate to="/conductor" replace />
+          ) : (
+            <Inicio />
+          )
+        }
+      />
       <Route path="/login" element={sesion ? <Navigate to="/" replace /> : <Login />} />
       <Route
         path="/admin"
