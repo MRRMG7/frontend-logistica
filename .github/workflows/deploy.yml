@@ -1,0 +1,42 @@
+name: Desplegar a produccion
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-produccion
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Compilar y publicar en Apache
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Mostrar que se desplego
+        run: echo "Desplegando el commit ${{ github.sha }} desde ${{ github.ref_name }}"
+
+      - name: Conectar al servidor y desplegar
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 77.112.253.219
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          # Solo se acepta la llave publica de este servidor (evita ataques man-in-the-middle)
+          fingerprint: 51:b3:1b:19:d1:d5:7e:bc:52:6a:e8:d3:47:b9:25:0f
+          port: 22
+          script: sudo -n /var/www/deploy.sh
+
+      - name: Comprobar que el sitio responde
+        run: |
+          sleep 3
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' http://77.112.253.219)
+          echo "HTTP $CODE"
+          if [ "$CODE" != "200" ]; then
+            echo "El sitio no responde bien (HTTP $CODE)"
+            exit 1
+          fi
+          echo "Sitio en linea"
