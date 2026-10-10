@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { ESTADO_META, api, nombreCliente, nombreConductor } from "../api";
@@ -22,11 +23,8 @@ const AVANCE: Record<string, number> = {
   CANCELADO: 1,
 };
 
-interface Props {
-  onEntrar: () => void;
-}
-
-export default function Inicio({ onEntrar }: Props) {
+export default function Inicio() {
+  const navigate = useNavigate();
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -109,7 +107,7 @@ export default function Inicio({ onEntrar }: Props) {
             </span>
             <span className="marca-texto">Transporte &amp; Entregas</span>
           </div>
-          <button type="button" className="inicio-btn-acceso" onClick={onEntrar}>
+          <button type="button" className="inicio-btn-acceso" onClick={() => navigate("/login")}>
             Acceso · Iniciar sesión
           </button>
         </div>
@@ -280,7 +278,7 @@ export default function Inicio({ onEntrar }: Props) {
 
       <footer className="inicio-pie">
         <p>Sistema de Gestión de Transporte y Entregas · El Salvador</p>
-        <button type="button" className="link-suave" onClick={onEntrar}>
+        <button type="button" className="link-suave" onClick={() => navigate("/login")}>
           Acceso administrativo
         </button>
       </footer>
