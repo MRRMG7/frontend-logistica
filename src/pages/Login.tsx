@@ -63,15 +63,15 @@ export default function Login() {
         </p>
       </section>
 
-      <section className="panel-form">
+      <section className="panel-formulario">
+        <div className="tarjeta-login">
         <form onSubmit={enviar} className="form-login">
           <h2 className="form-titulo">Iniciar sesión</h2>
           <p className="form-subtitulo">Ingresá con tus credenciales para acceder al panel.</p>
 
-          <label className="label">
+          <label className="campo">
             Usuario
             <input
-              className="input"
               type="text"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
@@ -80,10 +80,9 @@ export default function Login() {
             />
           </label>
 
-          <label className="label">
+          <label className="campo">
             Contraseña
             <input
-              className="input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -92,20 +91,21 @@ export default function Login() {
             />
           </label>
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className="error-login">{error}</p>}
 
-          <button className="btn-primario" type="submit" disabled={cargando}>
+          <button className="btn-entrar" type="submit" disabled={cargando}>
             {cargando ? "Ingresando..." : "Ingresar"}
           </button>
 
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="mt-3 w-full rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="link-suave"
           >
             Volver al inicio
           </button>
         </form>
+        </div>
       </section>
     </main>
   );
