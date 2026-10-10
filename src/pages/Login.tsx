@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 
 export default function Login() {
@@ -8,6 +9,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname || "/";
+  const registroCompletado = (location.state as { registroCompletado?: boolean } | null)?.registroCompletado;
 
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
@@ -94,6 +96,12 @@ export default function Login() {
           <h2 className="form-titulo">Iniciar sesión</h2>
           <p className="form-subtitulo">Ingresá con tus credenciales para acceder al panel.</p>
 
+          {registroCompletado && (
+            <p className="aviso-banner verde" role="status">
+              Tu cuenta se creó correctamente. Iniciá sesión para entrar al panel.
+            </p>
+          )}
+
           <label className="campo">
             Usuario
             <input
@@ -121,6 +129,10 @@ export default function Login() {
           <button className="btn-entrar" type="submit" disabled={cargando}>
             {cargando ? "Ingresando..." : "Ingresar"}
           </button>
+
+          <Link to="/registro" className="link-suave">
+            ¿No tenés cuenta? Registrate
+          </Link>
 
           <button
             type="button"

@@ -5,6 +5,7 @@ import Inicio from "./pages/Inicio";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ConductorPanel from "./pages/ConductorPanel";
 import ClientePanel from "./pages/ClientePanel";
+import Registro from "./pages/Registro";
 
 function Protegido({ children, roles }: { children: React.ReactNode; roles?: ("ADMIN" | "CONDUCTOR" | "CLIENTE")[] }) {
   const { sesion } = useAuth();
@@ -45,6 +46,7 @@ function RouterApp() {
         }
       />
       <Route path="/login" element={sesion ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/registro" element={sesion ? <Navigate to="/" replace /> : <Registro />} />
       <Route
         path="/admin"
         element={

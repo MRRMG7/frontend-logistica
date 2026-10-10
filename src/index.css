@@ -531,6 +531,18 @@ input, select, textarea { font-family: inherit; }
 
 .tarjeta-login { width: 100%; max-width: 400px; }
 
+.tarjeta-registro { max-width: 560px; }
+
+.registro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+
+.campo-completo { grid-column: 1 / -1; }
+
+.registro-login { text-align: center; color: var(--tinta-500); font-size: 13px; }
+
+.registro-login a { color: #0b8378; font-weight: 600; text-decoration: none; }
+
+.registro-login a:hover { text-decoration: underline; }
+
 .form-titulo { font-size: 24px; font-weight: 600; }
 .form-subtitulo { margin-top: 6px; color: var(--tinta-500); font-size: 14px; }
 
@@ -805,4 +817,6 @@ input, select, textarea { font-family: inherit; }
   .side-link { white-space: nowrap; }
   .side-pie { display: none; }
   .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
+  .registro-grid { grid-template-columns: 1fr; }
+  .campo-completo { grid-column: auto; }
 }
