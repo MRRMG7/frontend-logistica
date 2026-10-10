@@ -61,6 +61,31 @@ export default function Login() {
         <p className="subtitular">
           Administradores, conductores y clientes comparten un solo lugar para saber dónde va cada entrega y en qué estado está.
         </p>
+
+        <div className="ruta-animada" aria-hidden="true">
+          <svg viewBox="0 0 640 300" fill="none">
+            <path
+              className="linea-base"
+              d="M 60 180 C 150 70, 250 190, 330 120 C 400 60, 500 170, 590 60"
+            />
+            <path
+              className="linea-flujo"
+              d="M 60 180 C 150 70, 250 190, 330 120 C 400 60, 500 170, 590 60"
+            />
+            <circle className="nodo-fuera" cx="60" cy="180" r="15" fill="rgba(245,166,35,.18)" />
+            <circle className="nodo" cx="60" cy="180" r="10" fill="#f5a623" />
+            <circle className="nodo-fuera" cx="330" cy="120" r="15" fill="rgba(245,166,35,.18)" />
+            <circle className="nodo" cx="330" cy="120" r="10" fill="#f5a623" />
+            <circle cx="590" cy="60" r="14" fill="rgba(46,196,182,.16)" />
+            <circle className="nodo" cx="590" cy="60" r="10" fill="#2ec4b6" />
+          </svg>
+          <span className="etiqueta-ruta camino">En camino</span>
+          <span className="etiqueta-ruta entregado">Entregado</span>
+        </div>
+
+        <p className="pie-marca">
+          Sistema de Gestión de Transporte y Entregas · El Salvador
+        </p>
       </section>
 
       <section className="panel-formulario">
