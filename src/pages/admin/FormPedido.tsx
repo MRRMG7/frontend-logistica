@@ -4,7 +4,7 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { api } from "../../api";
 import { geocodificar, geocodificarInversa } from "../../geo";
-import { ESTILO_MAPA } from "../../mapa";
+import { estaDentroDeElSalvador, ESTILO_MAPA, LIMITES_EL_SALVADOR } from "../../mapa";
 import type { Cliente, Conductor, Pedido, Vehiculo } from "../../types";
 
 interface Props {
@@ -44,6 +44,8 @@ export default function FormPedido({
   const [guardando, setGuardando] = useState(false);
   const mapaCont = useRef<HTMLDivElement>(null);
   const pinRef = useRef<maplibregl.Marker | null>(null);
+  const coordsValidasRef = useRef({ lat: latitud, lng: longitud });
+  coordsValidasRef.current = { lat: latitud, lng: longitud };
 
   useEffect(() => {
     if (!clientesFetched.length) {
@@ -107,12 +109,19 @@ export default function FormPedido({
       style: ESTILO_MAPA,
       center: inicial,
       zoom: 14,
+      maxBounds: LIMITES_EL_SALVADOR,
     });
     const pin = new maplibregl.Marker({ color: "#e53e3e", draggable: true })
       .setLngLat(inicial)
       .addTo(mapa);
     pinRef.current = pin;
     const aplicar = (lng: number, lat: number) => {
+      if (!estaDentroDeElSalvador(lat, lng)) {
+        setError("El punto de entrega debe estar dentro de El Salvador.");
+        pin.setLngLat([coordsValidasRef.current.lng, coordsValidasRef.current.lat]);
+        return;
+      }
+      setError("");
       setLongitud(lng);
       setLatitud(lat);
       geocodificarInversa(lat, lng).then((dir) => {
@@ -145,6 +154,9 @@ export default function FormPedido({
     if (!texto) return setError("Escribí la dirección para ubicarla en el mapa.");
     try {
       const res = await geocodificar(texto);
+      if (!estaDentroDeElSalvador(res.lat, res.lon)) {
+        return setError("La dirección debe estar dentro de El Salvador.");
+      }
       setLatitud(res.lat);
       setLongitud(res.lon);
       pinRef.current?.setLngLat([res.lon, res.lat]);
@@ -160,7 +172,10 @@ export default function FormPedido({
     const nombre = nombreCliente.trim();
     if (!nombre) return setError("Escribí el nombre del cliente.");
     if (!direccion.trim()) return setError("Completá la dirección.");
-    if (!latitud || !longitud) return setError("Las coordenadas son obligatorias.");
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) return setError("Las coordenadas son obligatorias.");
+    if (!estaDentroDeElSalvador(latitud, longitud)) {
+      return setError("El punto de entrega debe estar dentro de El Salvador.");
+    }
 
     let clienteId =
       idCliente ||

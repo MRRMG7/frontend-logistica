@@ -104,7 +104,7 @@ La interfaz cambia según el rol del usuario autenticado:
 
 - **ADMIN** — panel completo con tabs de clientes, conductores, vehículos, pedidos, paquetes y mapa.
 - **CONDUCTOR** — panel de pedidos asignados y actualización de estado.
-- **CLIENTE** — seguimiento de sus pedidos.
+- **CLIENTE** — consulta y seguimiento de sus pedidos, además de edición de sus datos de contacto.
 
 ## Stack
 

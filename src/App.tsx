@@ -1,9 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth";
 import Login from "./pages/Login";
 import Inicio from "./pages/Inicio";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ConductorPanel from "./pages/ConductorPanel";
+import ClientePanel from "./pages/ClientePanel";
 
 function Protegido({ children, roles }: { children: React.ReactNode; roles?: ("ADMIN" | "CONDUCTOR" | "CLIENTE")[] }) {
   const { sesion } = useAuth();
@@ -23,24 +24,10 @@ function Protegido({ children, roles }: { children: React.ReactNode; roles?: ("A
 }
 
 function RouterApp() {
-  const { sesion, logout } = useAuth();
-  const navigate = useNavigate();
+  const { sesion } = useAuth();
 
   if (sesion && sesion.rol === "CLIENTE") {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-100 text-slate-600">
-        <p>Panel {sesion.rol} en construcción.</p>
-        <button
-          onClick={() => {
-            logout();
-            navigate("/", { replace: true });
-          }}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-200"
-        >
-          Cerrar sesión
-        </button>
-      </div>
-    );
+    return <ClientePanel />;
   }
 
   return (

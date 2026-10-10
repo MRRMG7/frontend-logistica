@@ -3,7 +3,7 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useAuth } from "../auth";
 import { ESTADO_META, api, nombreCliente } from "../api";
-import { ESTILO_MAPA } from "../mapa";
+import { estaDentroDeElSalvador, ESTILO_MAPA, LIMITES_EL_SALVADOR } from "../mapa";
 import type { Cliente, Pedido } from "../types";
 import EstadoPill from "../components/EstadoPill";
 
@@ -53,6 +53,7 @@ export default function ConductorPanel() {
       style: ESTILO_MAPA,
       center: [-89.2, 13.69],
       zoom: 8,
+      maxBounds: LIMITES_EL_SALVADOR,
     });
     mapaRef.current = mapa;
     return () => {
@@ -71,7 +72,7 @@ export default function ConductorPanel() {
       for (const m of prev as maplibregl.Marker[]) m.remove();
     }
     const marcadores: maplibregl.Marker[] = [];
-    const conCoordenadas = propios.filter((p) => p.latitud && p.longitud);
+    const conCoordenadas = propios.filter((p) => estaDentroDeElSalvador(p.latitud, p.longitud));
     conCoordenadas.forEach((p) => {
       const etiqueta = (ESTADO_META[p.estado] || {}).etiqueta || p.estado;
       const popup = new maplibregl.Popup({ offset: 26, closeButton: false }).setHTML(

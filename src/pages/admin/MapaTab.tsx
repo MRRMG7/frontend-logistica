@@ -4,7 +4,7 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { ESTADO_META, nombreCliente } from "../../api";
 import { geocodificar, geocodificarInversa } from "../../geo";
-import { ESTILO_MAPA } from "../../mapa";
+import { estaDentroDeElSalvador, ESTILO_MAPA, LIMITES_EL_SALVADOR } from "../../mapa";
 import type { Cliente, Conductor, Pedido, Vehiculo } from "../../types";
 import FormPedido from "./FormPedido";
 
@@ -55,6 +55,7 @@ export default function MapaTab({ pedidos, clientes, conductores, vehiculos, onC
       style: ESTILO_MAPA,
       center: [-88.9, 13.7],
       zoom: 7,
+      maxBounds: LIMITES_EL_SALVADOR,
     });
     mapa.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     mapa.on("error", (e) => {
@@ -70,9 +71,15 @@ export default function MapaTab({ pedidos, clientes, conductores, vehiculos, onC
       pinRef.current = pin;
       pin.on("dragend", () => {
         const { lat, lng } = pin.getLngLat();
+        if (!estaDentroDeElSalvador(lat, lng)) {
+          pin.setLngLat([coordsRef.current.lng, coordsRef.current.lat]);
+          setMensaje("El punto de entrega debe estar dentro de El Salvador.");
+          return;
+        }
         actualizarCoords(lat, lng);
       });
       mapa.on("click", (e) => {
+        if (!estaDentroDeElSalvador(e.lngLat.lat, e.lngLat.lng)) return;
         pin.setLngLat(e.lngLat);
         actualizarCoords(e.lngLat.lat, e.lngLat.lng);
       });
@@ -98,7 +105,7 @@ export default function MapaTab({ pedidos, clientes, conductores, vehiculos, onC
     }
     const marcadores: maplibregl.Marker[] = [];
     pedidos
-      .filter((p) => p.estado !== "CANCELADO" && p.latitud && p.longitud)
+      .filter((p) => p.estado !== "CANCELADO" && estaDentroDeElSalvador(p.latitud, p.longitud))
       .forEach((p) => {
         const etiqueta = (ESTADO_META[p.estado] || {}).etiqueta || p.estado;
         const popup = new maplibregl.Popup({ offset: 26, closeButton: false }).setHTML(
@@ -183,7 +190,7 @@ function encuadrarPedidosActivos(
   _clientes: Cliente[],
 ) {
   const activos = pedidos.filter(
-    (p) => p.estado !== "CANCELADO" && p.estado !== "ENTREGADO" && p.latitud && p.longitud,
+    (p) => p.estado !== "CANCELADO" && p.estado !== "ENTREGADO" && estaDentroDeElSalvador(p.latitud, p.longitud),
   );
   if (!activos.length) return;
   const conCoordenadas = activos.map((p) => [p.longitud, p.latitud] as [number, number]);

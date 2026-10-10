@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { ESTADO_META, api, nombreCliente, nombreConductor } from "../api";
-import { ESTILO_MAPA } from "../mapa";
+import { estaDentroDeElSalvador, ESTILO_MAPA, LIMITES_EL_SALVADOR } from "../mapa";
 import type { Cliente, Conductor, Pedido } from "../types";
 
 const PASOS: { estado: Pedido["estado"]; etiqueta: string; detalle: string }[] = [
@@ -39,12 +39,13 @@ export default function Inicio() {
     if (!pedido || !mapaCont.current) return;
     const lng = Number(pedido.longitud);
     const lat = Number(pedido.latitud);
-    if (!lng || !lat) return;
+    if (!estaDentroDeElSalvador(lat, lng)) return;
     const mapa = new maplibregl.Map({
       container: mapaCont.current,
       style: ESTILO_MAPA,
       center: [lng, lat],
       zoom: 13,
+      maxBounds: LIMITES_EL_SALVADOR,
     });
     const popup = new maplibregl.Popup({ offset: 26, closeButton: false }).setHTML(
       `<b>#${pedido.id_pedido}</b><br/>` +
@@ -218,9 +219,13 @@ export default function Inicio() {
                   </div>
                 </div>
 
-                <div className="inicio-mapa">
-                  <div ref={mapaCont} className="inicio-mapa-contenido" />
-                </div>
+                {estaDentroDeElSalvador(Number(pedido.latitud), Number(pedido.longitud)) ? (
+                  <div className="inicio-mapa">
+                    <div ref={mapaCont} className="inicio-mapa-contenido" />
+                  </div>
+                ) : (
+                  <p className="aviso-banner ambar">La ubicación del pedido está fuera del área de servicio.</p>
+                )}
               </div>
             )}
           </div>
