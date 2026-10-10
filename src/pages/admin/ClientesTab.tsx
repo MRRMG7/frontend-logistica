@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { api } from "../../api";
+import { api, ApiError } from "../../api";
 import type { Cliente, Pedido } from "../../types";
 
 interface Props {
@@ -42,12 +42,18 @@ export default function ClientesTab({ clientes, pedidos, onCambio }: Props) {
 
   async function eliminar(c: Cliente) {
     if (!confirm(`¿Eliminar al cliente ${c.nombre}?`)) return;
+    setError("");
+    setAviso("");
     try {
       await api(`/clientes/${c.id_cliente}`, { method: "DELETE" });
-      await onCambio();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "No se pudo eliminar.");
+      setError(err instanceof ApiError && err.status === 404
+        ? "Cuenta no existente."
+        : err instanceof Error ? err.message : "No se pudo eliminar.");
+      return;
     }
+    setAviso("Cuenta eliminada.");
+    await onCambio();
   }
 
   async function enviar(e: FormEvent) {
@@ -73,7 +79,9 @@ export default function ClientesTab({ clientes, pedidos, onCambio }: Props) {
       setAviso("Cliente guardado correctamente.");
       await onCambio();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar el cliente.");
+      setError(err instanceof ApiError && err.status === 404
+        ? "Cuenta no existente."
+        : err instanceof Error ? err.message : "No se pudo guardar el cliente.");
     }
   }
 

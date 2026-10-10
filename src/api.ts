@@ -3,6 +3,13 @@ import type { Estado } from "./types";
 export const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined)?.trim() || "http://localhost:8000";
 
+export class ApiError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 export const ESTADO_META: Record<
   Estado,
   { etiqueta: string; color: string; fondo: string }
@@ -32,7 +39,7 @@ export async function api<T>(url: string, opciones: RequestInit = {}): Promise<T
     } catch {
       /* cuerpo no JSON */
     }
-    throw new Error(mensaje);
+    throw new ApiError(mensaje, res.status);
   }
   if (res.status === 204) return undefined as T;
   return res.json();
