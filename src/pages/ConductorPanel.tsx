@@ -192,9 +192,6 @@ export default function ConductorPanel() {
               const cliente = clientes.find((c) => c.id_cliente === p.id_cliente);
               const telefono = cliente?.telefono?.trim() || "";
               const telefonoLlamada = telefono.replace(/[^\d+]/g, "");
-              let telefonoWhatsApp = telefono.replace(/\D/g, "");
-              if (telefonoWhatsApp.length === 8) telefonoWhatsApp = `503${telefonoWhatsApp}`;
-              const correo = cliente?.email?.trim() || "";
 
               return (
               <div className="entrega-card" key={p.id_pedido}>
@@ -204,24 +201,15 @@ export default function ConductorPanel() {
                 </div>
                 <p className="entrega-cliente">{nombreCliente(p, clientes)}</p>
                 <div className="entrega-contacto">
-                  <p>
-                    <span className="entrega-contacto-label">Teléfono</span>
-                    {telefono ? <a href={`tel:${telefonoLlamada}`}>{telefono}</a> : <span>No registrado</span>}
-                  </p>
-                  <p>
-                    <span className="entrega-contacto-label">Correo</span>
-                    {correo ? <a href={`mailto:${encodeURIComponent(correo)}`}>{correo}</a> : <span>No registrado</span>}
-                  </p>
-                  {cliente?.direccion && (
-                    <p><span className="entrega-contacto-label">Dirección registrada</span>{cliente.direccion}</p>
-                  )}
-                  {telefonoWhatsApp && (
-                    <a className="entrega-contacto-boton entrega-contacto-whatsapp" href={`https://wa.me/${encodeURIComponent(telefonoWhatsApp)}`} target="_blank" rel="noopener noreferrer">
-                      Contactar por WhatsApp
+                  <span className="entrega-contacto-label">Celular del cliente</span>
+                  {telefono ? (
+                    <a className="entrega-contacto-telefono" href={`tel:${telefonoLlamada}`}>
+                      {telefono}
                     </a>
+                  ) : (
+                    <span className="entrega-contacto-sin-telefono">No registrado</span>
                   )}
                 </div>
-                <p className="entrega-dir"><span className="entrega-contacto-label">Dirección de entrega</span>{p.direccion}</p>
                 <div className="entrega-acciones">
                   {p.estado === "ASIGNADO" && (
                     <button
